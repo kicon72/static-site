@@ -16,9 +16,9 @@ import { WebsiteStage } from "../stages/website";
  * The stack that defines the application pipeline
  */
 export class PipelineStack extends Stack {
-  readonly domainName = "static-site.alst.superluminar.io";
-  readonly hostedZoneName = "alst.superluminar.io";
-  readonly hostedZoneId = "Z06582792RO4T9WZ06BUN";
+  readonly domainName = "www.levutv.com";
+  readonly hostedZoneName = "levutv.com";
+  readonly hostedZoneId = "Z05384492FNGCN5SIVJA5";
 
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
@@ -77,7 +77,7 @@ export class PipelineStack extends Stack {
         actionName: "GitHub",
         output: sourceArtifact,
         oauthToken: SecretValue.secretsManager("github-token"),
-        owner: "superluminar-io",
+        owner: "kicon72",
         repo: "static-site",
         branch: "main",
       }),
