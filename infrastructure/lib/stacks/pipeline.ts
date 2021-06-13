@@ -31,36 +31,6 @@ export class PipelineStack extends Stack {
       cloudAssemblyArtifact,
       sourceArtifact
     );
-
-    const websiteInfrastructureStage = new WebsiteStage(
-      this,
-      "WebsiteInfrastructureStage",
-      {
-        domainName: this.domainName,
-        hostedZoneName: this.hostedZoneName,
-        hostedZoneId: this.hostedZoneId,
-        ...props,
-      }
-    );
-
-    pipeline.addApplicationStage(websiteInfrastructureStage);
-
-    const websiteBuildAndDeployStage = pipeline.addStage(
-      "WebsiteBuildAndDeployStage"
-    );
-
-    websiteBuildAndDeployStage.addActions(
-      this.buildAction(
-        sourceArtifact,
-        buildArtifact,
-        websiteBuildAndDeployStage.nextSequentialRunOrder()
-      ),
-      this.deployAction(
-        buildArtifact,
-        this.domainName,
-        websiteBuildAndDeployStage.nextSequentialRunOrder()
-      )
-    );
   }
 
   private buildCDKPipeline(
@@ -87,43 +57,6 @@ export class PipelineStack extends Stack {
         cloudAssemblyArtifact,
         subdirectory: "infrastructure",
       }),
-    });
-  }
-
-  private buildAction(
-    sourceArtifact: Codepipeline.Artifact,
-    buildArtifact: Codepipeline.Artifact,
-    runOrder: number
-  ): CodepipelineActions.CodeBuildAction {
-    return new CodepipelineActions.CodeBuildAction({
-      input: sourceArtifact,
-      outputs: [buildArtifact],
-      runOrder: runOrder,
-      actionName: "Build",
-      project: new CodeBuild.PipelineProject(this, "StaticSiteBuildProject", {
-        projectName: "StaticSiteBuildProject",
-        buildSpec: CodeBuild.BuildSpec.fromSourceFilename(
-          "frontend/buildspec.yml"
-        ),
-        environment: {
-          buildImage: CodeBuild.LinuxBuildImage.STANDARD_4_0,
-        },
-      }),
-    });
-  }
-
-  private deployAction(
-    input: Codepipeline.Artifact,
-    bucketName: string,
-    runOrder: number
-  ): CodepipelineActions.S3DeployAction {
-    const bucket = Bucket.fromBucketName(this, "WebsiteBucket", bucketName);
-
-    return new CodepipelineActions.S3DeployAction({
-      actionName: "Deploy",
-      runOrder: runOrder,
-      input: input,
-      bucket: bucket,
     });
   }
 }
